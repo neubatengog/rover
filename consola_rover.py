@@ -3,15 +3,11 @@ import glob
 from Tkinter import *
 
 
-""" Funcion que scanea las rutas de los puertos seriales """
+""" Funcion que scanea las rutas fisicas de los puertos seriales """
 def scan():
-    """Scan de puertos habilitados serial (linux, OSX) """
     return glob.glob('/dev/tty.*') + glob.glob('/dev/ttyUSB*') + glob.glob('/dev/ttyACM*')
 
 class App:
-
-
-	
 	def __init__(self, master):
 		frame = Frame (master)
 		frame.pack()
@@ -62,12 +58,20 @@ class App:
 		"""_______________ fin movimiento rover__________________"""
 		
 		#Puertos seriales detectados para seleccionar
-		Label(frame, text = 'PUERTO SERIAL'). grid(row=13, column=0)
+		Label(frame, text = 'Puertos detectados:'). grid(row=13, column=0)
 		listbox = Listbox(frame, height = 2, selectmode=SINGLE)
 		listbox.bind("<<ListboxSelect>>",self.Conectar)
 		for puerto in scan():
 			listbox.insert(END, puerto)
 		listbox.grid(row=13, column=1)
+
+		self.accion = StringVar()
+		Label(frame, 
+					textvariable= self.accion,
+					bg = "light green",
+					font = "Helvetica 16 bold"
+			).grid(row=17, column=1)
+
 
 		
 
@@ -82,54 +86,55 @@ class App:
 		
 	#paneo de camara
 	def pan(self):
-		print ('PANEO')
+		self.accion.set("PANEO")
 		ser.write('p\n')
+
 	#centrar el servo de la camara
 	def arriba(self):
-		print ('<<<--CENT--->>>')
+		self.accion.set("CAMARA CENT")
 		ser.write('k\n')
 	#movimiento izquierda camara	
 	def izq(self):
-		print ('<<<--IZQ')
+		self.accion.set("<<<IZQ")
 		ser.write('j\n')		
 	#movimiento derecha camara
 	def der(self):
-		print ('DER-->>>')
+		self.accion.set("DER>>>")
 		ser.write('l\n')
 	#movimiento avanzar rover
 	def avanzar(self):
-		print('AVANZA')
+		self.accion.set("AVANZAR")
 		ser.write('w\n')
 	#movimiento retroceder rover
 	def retro(self):
-		print('RETRO')
+		self.accion.set("RETROCE")
 		ser.write('s\n')
 	#movimiento izquierda rover
 	def moveiz(self):
-		print('<<< MOVER ')
+		self.accion.set("<<< MOVER ")
 		ser.write('w\n')
 	#movimiento derecha rover
 	def movede(self):
-		print('MOVER >>>')
+		self.accion.set("MOVER >>>")
 		ser.write('d\n')
 	#movimiento detener rover
 	def moveStop(self):
-		print('STOP!!!')
+		self.accion.set("DETENER")
 		ser.write('s\n s\n')
 	#movimiento aumentar velocidad rover
 	def Aumentar(self):
-		print('+++')
+		self.accion.set("VEL++")
 		ser.write('+\n')
 	#movimiento disminuir velocidad rover
 	def Disminuir(self):
-		print('---')
+		self.accion.set("VEL--")
 		ser.write('-\n')
 
 if __name__=='__main__':	
 	principal = Tk()
 	#titulo de la ventana
 	principal.wm_title('ROVER')
-	#tamaño de la venta principal
+	#tamano de la ventana principal
 	principal.geometry("400x400")
 	app = App(principal)
 	principal.mainloop()
