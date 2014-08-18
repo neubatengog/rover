@@ -2,14 +2,16 @@ import serial
 import glob
 
 from Tkinter import *
-ser = serial.Serial('/dev/ttyACM1')
-ser.baudrate = 57600
+
+
 
 def scan():
     """Scan de puertos habilitados serial (linux, OSX) """
     return glob.glob('/dev/tty.*') + glob.glob('/dev/ttyUSB*') + glob.glob('/dev/ttyACM*')
 
 class App:
+
+
 	
 	def __init__(self, master):
 		frame = Frame (master)
@@ -57,7 +59,28 @@ class App:
 		
 		butDisminuir = Button(frame, text='-', command=self.Disminuir)
 		butDisminuir.grid(row=9, column=3)
-	
+
+		
+		#Puertos seriales detectados para seleccionar
+		Label(frame, text = 'PUERTO SERIAL'). grid(row=13, column=0)
+		listbox = Listbox(frame, height = 2, selectmode=SINGLE)
+		listbox.bind("<<ListboxSelect>>",self.Conectar)
+		for puerto in scan():
+			listbox.insert(END, puerto)
+		listbox.grid(row=13, column=1)
+
+		
+
+
+	def Conectar(self, event):
+		w = event.widget
+		index = int (w.curselection()[0])
+		value = w.get(index)
+		global ser
+		ser = serial.Serial(value, 57600)
+		ser.timeout = 1;
+		
+
 	def pan(self):
 		print ('PANEO')
 		ser.write('p\n')
@@ -103,14 +126,13 @@ class App:
 		ser.write('-\n')
 
 if __name__=='__main__':	
-	print "Found ports:"
-	for name in scan():
-		print name
+	
 		
 	principal = Tk()
 	principal.wm_title('ROVER')
 
-	principal.geometry("200x200")
+
+	principal.geometry("400x400")
 	app = App(principal)
 	principal.mainloop()
 	
