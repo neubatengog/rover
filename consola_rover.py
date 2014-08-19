@@ -1,11 +1,13 @@
 import serial
 import glob
 from Tkinter import *
-
+import tkMessageBox
 
 
 class App:
 	def __init__(self, master):
+		self.ser = None
+
 		frame = Frame (master)
 		frame.pack()
 		"""____________movimiento de camara, j, k , l , p____ """
@@ -27,6 +29,17 @@ class App:
 		#boton de movimiento derecha de camara
 		butDer = Button(frame, text='>>',width=6, height=2, command=self.der)
 		butDer.grid(row=2, column=2)		
+
+		self.w2 = Scale(frame,
+				from_=0, 
+				to=180, 
+				length=400, 
+				tickinterval=20, 
+				orient=HORIZONTAL)
+		self.w2.set(90)
+		self.w2.bind("<ButtonRelease-1>", self.valorSlider)
+
+		self.w2.grid(row=3, column=0, columnspan=4)
 		"""_______________ fin movimiento__________________ """
 
 		"""_______________ movimiento rover__________________"""
@@ -71,63 +84,122 @@ class App:
 					font = "Helvetica 16 bold"
 			).grid(row=17, column=1)
 
+	#valores de barra slice de 0 a 180
+	def valorSlider(self, event):
+		try:
+			self.ser.write(string(self.w2.get())+"\n")	
+		except Exception, e:
+			tkMessageBox.showinfo("Error", "No se ha podido enviar la orden \n verifique el puerto serial")
+			
 
-		
-
-	#evento al seleccionar un puerto del listado
+	"""evento al seleccionar un puerto del listado para conectar
+	 con el puerto serial seleccionado de la lista"""
 	def Conectar(self, event):
 		w = event.widget
 		index = int (w.curselection()[0])
 		value = w.get(index)
-		global ser
-		ser = serial.Serial(value, 57600)
-		ser.timeout = 1;
-		
+		try:
+			if self.ser == None:
+				self.ser = serial.Serial(value, 57600)
+				self.ser.timeout = 1;
+			else:
+				if self.ser.isOpen():
+					self.ser.close()
+					self.ser=None
+				else:
+					self.ser.open()
+		except serial.SerialException, e:
+			tkMessageBox.showinfo("Error", "problema al conectar el puerto serial seleccionado")
+
 	#paneo de camara
 	def pan(self):
-		self.accion.set("PANEO")
-		ser.write('p\n')
-
+		try:
+			self.accion.set("PANEO")
+			self.ser.write('p\n')
+		except Exception, e:
+			tkMessageBox.showinfo("Error", "No se ha podido enviar la orden \n verifique el puerto serial")
+			
 	#centrar el servo de la camara
 	def arriba(self):
 		self.accion.set("CAMARA CENT")
-		ser.write('k\n')
+		try:
+			self.ser.write('k\n')
+		except Exception, e:
+			tkMessageBox.showinfo("Error", "No se ha podido enviar la orden \n verifique el puerto serial")
+
+		
 	#movimiento izquierda camara	
 	def izq(self):
-		self.accion.set("<<<IZQ")
-		ser.write('j\n')		
+		try:
+			self.accion.set("<<<IZQ")
+			self.ser.write('j\n')	
+		except Exception, e:
+			tkMessageBox.showinfo("Error", "No se ha podido enviar la orden \n verifique el puerto serial")
+	
 	#movimiento derecha camara
 	def der(self):
-		self.accion.set("DER>>>")
-		ser.write('l\n')
+		try:
+			self.accion.set("DER>>>")
+			self.ser.write('l\n')
+		except Exception, e:
+			tkMessageBox.showinfo("Error", "No se ha podido enviar la orden \n verifique el puerto serial")
+
 	#movimiento avanzar rover
 	def avanzar(self):
-		self.accion.set("AVANZAR")
-		ser.write('w\n')
+		try:
+			self.accion.set("AVANZAR")
+			self.ser.write('w\n')
+		except Exception, e:
+			tkMessageBox.showinfo("Error", "No se ha podido enviar la orden \n verifique el puerto serial")
+
 	#movimiento retroceder rover
 	def retro(self):
-		self.accion.set("RETROCE")
-		ser.write('s\n')
+		try:
+			self.accion.set("RETROCE")
+			self.ser.write('s\n')
+		except Exception, e:
+			tkMessageBox.showinfo("Error", "No se ha podido enviar la orden \n verifique el puerto serial")
+
 	#movimiento izquierda rover
 	def moveiz(self):
-		self.accion.set("<<< MOVER ")
-		ser.write('w\n')
+		try:
+			self.accion.set("<<< MOVER ")
+			self.ser.write('w\n')
+		except Exception, e:
+			tkMessageBox.showinfo("Error", "No se ha podido enviar la orden \n verifique el puerto serial")
+
 	#movimiento derecha rover
 	def movede(self):
-		self.accion.set("MOVER >>>")
-		ser.write('d\n')
+		try:
+			self.accion.set("MOVER >>>")
+			self.ser.write('d\n')
+		except Exception, e:
+			tkMessageBox.showinfo("Error", "No se ha podido enviar la orden \n verifique el puerto serial")
+
 	#movimiento detener rover
 	def moveStop(self):
-		self.accion.set("DETENER")
-		ser.write('s\n s\n')
+		try:
+			self.accion.set("DETENER")
+			self.ser.write('s\n s\n')
+		except Exception, e:
+			tkMessageBox.showinfo("Error", "No se ha podido enviar la orden \n verifique el puerto serial")
+
 	#movimiento aumentar velocidad rover
 	def Aumentar(self):
-		self.accion.set("VEL++")
-		ser.write('+\n')
+		try:
+			self.accion.set("VEL++")
+			self.ser.write('+\n')
+		except Exception, e:
+			tkMessageBox.showinfo("Error", "No se ha podido enviar la orden \n verifique el puerto serial")
+
+
 	#movimiento disminuir velocidad rover
 	def Disminuir(self):
-		self.accion.set("VEL--")
-		ser.write('-\n')
+		try:
+			self.accion.set("VEL--")
+			self.ser.write('-\n')
+		except Exception, e:
+			tkMessageBox.showinfo("Error", "No se ha podido enviar la orden \n verifique el puerto serial")
 
 	""" Funcion que scanea las rutas fisicas de los puertos seriales """
 	def scan(self):
@@ -139,7 +211,7 @@ if __name__=='__main__':
 	#titulo de la ventana
 	principal.wm_title('ROVER')
 	#tamano de la ventana principal
-	principal.geometry("450x350")
+	principal.geometry("450x550")
 	app = App(principal)
 	principal.mainloop()
 	
