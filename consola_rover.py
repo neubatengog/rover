@@ -56,7 +56,7 @@ class App:
 		butDe = Button(frame, text='>>',  width=7, height=3, command=self.movede)
 		butDe.grid(row=8, column=2)
 		#boton de movimiento detener
-		butStop = Button(frame, text='S',width=4, height=3, command=self.moveStop)
+		butStop = Button(frame, text='STOP',width=4, height=3, command=self.moveStop)
 		butStop.grid(row=8, column=1)
 		#boton de movimiento retroceder
 		butRetro = Button(frame, text='V',width=7, height=3, command=self.retro)
@@ -102,10 +102,12 @@ class App:
 			if self.ser == None:
 				self.ser = serial.Serial(value, 57600)
 				self.ser.timeout = 1;
+				self.accion.set("CONECTADO")
 			else:
 				if self.ser.isOpen():
 					self.ser.close()
 					self.ser=None
+					tkMessageBox.showinfo("Error", "El puerto ya se encuentra abierto")
 				else:
 					self.ser.open()
 		except serial.SerialException, e:
@@ -164,7 +166,7 @@ class App:
 	def moveiz(self):
 		try:
 			self.accion.set("<<< MOVER ")
-			self.ser.write('w\n')
+			self.ser.write('a\n')
 		except Exception, e:
 			tkMessageBox.showinfo("Error", "No se ha podido enviar la orden \n verifique el puerto serial")
 
@@ -180,7 +182,7 @@ class App:
 	def moveStop(self):
 		try:
 			self.accion.set("DETENER")
-			self.ser.write('s\n s\n')
+			self.ser.write('e\n')
 		except Exception, e:
 			tkMessageBox.showinfo("Error", "No se ha podido enviar la orden \n verifique el puerto serial")
 
