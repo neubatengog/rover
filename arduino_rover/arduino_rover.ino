@@ -10,7 +10,7 @@
 #define MOTOR2_VELO 5 // EB
    
    
-#define SERIALSPEED 9600
+#define SERIALSPEED 57600
  
 #define SERVOCAMARA 13
  

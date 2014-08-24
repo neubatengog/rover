@@ -3,12 +3,57 @@ import glob
 from Tkinter import *
 import tkMessageBox
 
+import cv2
+from PIL import Image, ImageTk
+
+import pygame
+import pygame.camera
+import time
+import Queue
+
+import threading
+
+pygame.init()
+
+
+class VideoCapturePlayer(object):
+    displaysize = (480, 435)
+    capturesize = ( 480, 420 )
+    mirror = True
+    delay = 0
+    font = pygame.font.SysFont(None,25)
+    text = font.render("Rover: video streaming", True, (255,255,255))
+    def __init__(self, **argd):
+        self.__dict__.update(**argd)
+        super(VideoCapturePlayer, self).__init__(**argd)
+        self.display = pygame.display.set_mode( self.displaysize )
+        pygame.camera.init()
+        self.camera = X=pygame.camera.Camera("/dev/video0", self.capturesize)
+        print pygame.camera.list_cameras()
+        self.camera.start()
+
+    def get_and_flip(self):
+        snapshot = self.camera.get_image()
+        snapshot = pygame.transform.scale(snapshot,(480,420))
+        self.display.blit(snapshot,(0,0))
+        self.display.blit(self.text, (2,415))
+        pygame.display.set_caption("Video")
+        pygame.display.update()
+
+    def main(self):
+        while 1:
+            time.sleep(self.delay)
+            self.get_and_flip()
+
 
 class App:
 	def __init__(self, master):
+
+		
 		self.ser = None
 
 		frame = Frame (master)
+
 		frame.pack()
 		"""____________movimiento de camara, j, k , l , p____ """
 		Label(frame, text = 'CAMARA',font = "Helvetica 12 bold",fg = "blue",
@@ -42,7 +87,7 @@ class App:
 		self.w2.grid(row=3, column=0, columnspan=4)
 		"""_______________ fin movimiento__________________ """
 
-		"""_______________ movimiento rover__________________"""
+		"""_______________ movimiento rover___________a, s,d, w, e____"""
 		Label(frame, text = 'ROVER', font = "Helvetica 12 bold",fg = "blue",
 		 bg = "yellow"). grid(row=6, column=1)
 		
@@ -82,7 +127,19 @@ class App:
 					textvariable= self.accion,
 					bg = "light green",
 					font = "Helvetica 16 bold"
-			).grid(row=17, column=1)
+			).grid(row=17, column=1)	
+
+		
+		butVideo = Button(frame, text='Video',width=3, height=3, command=self.ventana)
+		butVideo.grid(row=18, column=1)
+
+	
+	def ventana(self):
+		#q = Queue.Queue()
+		t = threading.Thread(target=VideoCapturePlayer().main, name='captura')
+		t.daemon = True #si se cierra el hilo principal, se cierra el video 
+		t.start()
+
 
 	#valores de barra slice de 0 a 180
 	def valorSlider(self, event):
@@ -208,12 +265,20 @@ class App:
 		return glob.glob('/dev/tty.*') + glob.glob('/dev/ttyUSB*') + glob.glob('/dev/ttyACM*')
 
 
+
+
+
 if __name__=='__main__':	
 	principal = Tk()
 	#titulo de la ventana
 	principal.wm_title('ROVER')
 	#tamano de la ventana principal
 	principal.geometry("450x550")
+	principal.bind(('<Escape>') , lambda e : principal.quit())
+
 	app = App(principal)
+
 	principal.mainloop()
+	
+	
 	
