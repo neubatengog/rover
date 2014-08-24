@@ -20,7 +20,7 @@ class Player(object):
         print pygame.camera.list_cameras()
         self.camera.start()
 
-    def get_and_flip(self):
+    def get_image(self):
         snapshot = self.camera.get_image()
         snapshot = pygame.transform.scale(snapshot,(480,420))
         self.display.blit(snapshot,(0,0))
@@ -31,4 +31,4 @@ class Player(object):
     def main(self):
         while 1:
             time.sleep(self.delay)
-            self.get_and_flip()
+            self.get_image()
