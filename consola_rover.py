@@ -1,49 +1,17 @@
 import serial
 import glob
+
 from Tkinter import *
 import tkMessageBox
 
-import cv2
 from PIL import Image, ImageTk
 
-import pygame
-import pygame.camera
-import time
 import Queue
-
 import threading
 
-pygame.init()
+import videocapture #clase para manejo de video
 
 
-class VideoCapturePlayer(object):
-    displaysize = (480, 435)
-    capturesize = ( 480, 420 )
-    mirror = True
-    delay = 0
-    font = pygame.font.SysFont(None,25)
-    text = font.render("Rover: video streaming", True, (255,255,255))
-    def __init__(self, **argd):
-        self.__dict__.update(**argd)
-        super(VideoCapturePlayer, self).__init__(**argd)
-        self.display = pygame.display.set_mode( self.displaysize )
-        pygame.camera.init()
-        self.camera = X=pygame.camera.Camera("/dev/video0", self.capturesize)
-        print pygame.camera.list_cameras()
-        self.camera.start()
-
-    def get_and_flip(self):
-        snapshot = self.camera.get_image()
-        snapshot = pygame.transform.scale(snapshot,(480,420))
-        self.display.blit(snapshot,(0,0))
-        self.display.blit(self.text, (2,415))
-        pygame.display.set_caption("Video")
-        pygame.display.update()
-
-    def main(self):
-        while 1:
-            time.sleep(self.delay)
-            self.get_and_flip()
 
 
 class App:
@@ -136,7 +104,7 @@ class App:
 	
 	def ventana(self):
 		#q = Queue.Queue()
-		t = threading.Thread(target=VideoCapturePlayer().main, name='captura')
+		t = threading.Thread(target=videocapture.Player().main, name='captura')
 		t.daemon = True #si se cierra el hilo principal, se cierra el video 
 		t.start()
 
